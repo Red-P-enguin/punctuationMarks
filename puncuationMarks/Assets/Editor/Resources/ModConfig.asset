@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 615501dbe4f3fe94fbf4b564abb10237, type: 3}
+  m_Name: ModConfig
+  m_EditorClassIdentifier: 
+  id: punctuationMarks
+  title: '...?'
+  author: Red Penguin
+  description: "==\r\n\u201CMemory\u2026 is the diary we all keep with us.\u201D ~Oscar
+    Wilde\r\nI never was the type to keep a diary.\r\n\r\nModule Name: ...?\nModule
+    ID: punctuationMarks\n\r\nManual: https://docs.google.com/document/d/1c40yXKr9WQG3yiS9a4bglZCYldyYF8S6Kb7b6DEL5xs/edit?usp=sharing
+    (original manual by Asew54321)\n\r\nPlaytesters: Asew54321, XMaster, and probably
+    some other people i'm forgetting about\n\nIdea by Asew54321, Implemented by Red
+    Penguin\n=="
+  version: 1
+  outputFolder: build
+  previewImage: {fileID: 2800000, guid: 24e6dc37f6840484c80859879580a548, type: 3}
