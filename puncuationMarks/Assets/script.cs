@@ -67,6 +67,7 @@ public class script : MonoBehaviour
                                           "321", "213", "231", "123", "132", "312", "132", "213", "231", "312" };
     private int wireIndex = 0;  
     private int nextWire = 0;
+    private bool[] cutWires = { false, false, false };
     //colored buttons
     public GameObject coloredButtonsGameObject;
     public Renderer[] coloredButtonss;
@@ -164,6 +165,25 @@ public class script : MonoBehaviour
     private int messageButtonPresses;
     private string[] messageColumnLetters = { "ATMSRE", "LOEDOP", "ECLARL", "TDSEAE", "CRUESE", "EARSHS", "REYALB", "USERTD", "TSLBAE", "SEIALD" };
     private string messageSelectedString;
+    private bool messageDisplayButtonPressed = false;
+
+    bool TwitchPlaysActive;
+    private bool TPActive = false;
+    private bool tpNumHigherThanThree;
+    private bool tpNumHigherThanSix;
+
+    void OnActivate()
+    {
+        if (TwitchPlaysActive == true)
+        {
+            TPActive = true;
+            DebugMsg("Twitch Plays mode active.");
+        }
+        else
+        {
+            TPActive = false;
+        }
+    }
 
     // Update is called once per frame
     void Awake()
@@ -310,8 +330,9 @@ public class script : MonoBehaviour
                     {
                         for (int i = 0; i < 3; i++)
                         {
-                            if(buttons[10 + i] == pressedButton)
+                            if(buttons[10 + i] == pressedButton && !cutWires[i])
                             {
+                                cutWires[i] = true;
                                 wires[i].GetComponent<MeshFilter>().mesh = wireCondition[1];
                                 if (wireCombinations[memoryBankColumn + (wireIndex * 10)][nextWire].ToString() != (i + 1).ToString())
                                 {
@@ -424,6 +445,7 @@ public class script : MonoBehaviour
                         {
                             StopAllCoroutines();
                             StartCoroutine(DisplayUpdater());
+                            messageDisplayButtonPressed = true;
                             messageDisplayButton.SetActive(false);
                         }
                         else
@@ -461,51 +483,103 @@ public class script : MonoBehaviour
     void logicDive()
     {
         logicDiveNumber++;
-        if (logicDiveNumber < 7)
+        if(!TPActive)
         {
-            logicDiveNotCorrectMats.Clear();
-            logicDiveCorrectButtonNum = Rnd.Range(0,9);
-            for(int i = 0; i < 10; i++)
+            if (logicDiveNumber < 7)
             {
-                if(logicDiveMats[i].name.Equals(memoryBanks[memoryBankNumber].ToString()))
+                logicDiveNotCorrectMats.Clear();
+                logicDiveCorrectButtonNum = Rnd.Range(0, 9);
+                for (int i = 0; i < 10; i++)
                 {
-                    logicDiveButtons[logicDiveCorrectButtonNum].material = logicDiveMats[i];
-                    for(int j = 0; j < 10; j++)
+                    if (logicDiveMats[i].name.Equals(memoryBanks[memoryBankNumber].ToString()))
                     {
-                        if(logicDiveMats[j] != logicDiveMats[i])
+                        logicDiveButtons[logicDiveCorrectButtonNum].material = logicDiveMats[i];
+                        for (int j = 0; j < 10; j++)
                         {
-                            logicDiveNotCorrectMats.Add(logicDiveMats[j]);
+                            if (logicDiveMats[j] != logicDiveMats[i])
+                            {
+                                logicDiveNotCorrectMats.Add(logicDiveMats[j]);
+                            }
                         }
+                        i = 10;
                     }
-                    i = 10;
                 }
-            }
-            for(int i = 0; i < 9; i++)
-            {
-                if(i != logicDiveCorrectButtonNum)
+                for (int i = 0; i < 9; i++)
                 {
-                    logicDiveIndex = Rnd.Range(0, logicDiveNotCorrectMats.Count);
-                    logicDiveButtons[i].material = logicDiveNotCorrectMats[logicDiveIndex];
-                    logicDiveNotCorrectMats.RemoveAt(logicDiveIndex);
+                    if (i != logicDiveCorrectButtonNum)
+                    {
+                        logicDiveIndex = Rnd.Range(0, logicDiveNotCorrectMats.Count);
+                        logicDiveButtons[i].material = logicDiveNotCorrectMats[logicDiveIndex];
+                        logicDiveNotCorrectMats.RemoveAt(logicDiveIndex);
+                    }
+                }
+                if (logicDiveActive)
+                {
+                    Invoke("logicDive", 1);
                 }
             }
-            if (logicDiveActive)
+            else if (logicDiveActive) //just to be safe
             {
-                Invoke("logicDive", 1);
+                logicDiveGameObject.transform.localPosition = new Vector3(logicDiveGameObject.transform.localPosition.x, logicDiveGameObject.transform.localPosition.y + 100f, logicDiveGameObject.transform.localPosition.z);
+                buttons[0].transform.localPosition = new Vector3(buttons[0].transform.localPosition.x, buttons[0].transform.localPosition.y - 100f, buttons[0].transform.localPosition.z);
+                moduleButtonGameObject.SetActive(true);
+                logicDiveActive = false;
+                logicDiveNumber = 0;
+                startingSoundEnabled = true;
+                memoryBankSeen = false;
+                GetComponent<KMBombModule>().HandleStrike();
+                DebugMsg("Strike! Took too long in logic dive.");
+                StartCoroutine(glitchEffect());
             }
         }
-        else if (logicDiveActive) //just to be safe
+        else
         {
-            logicDiveGameObject.transform.localPosition = new Vector3(logicDiveGameObject.transform.localPosition.x, logicDiveGameObject.transform.localPosition.y + 100f, logicDiveGameObject.transform.localPosition.z);
-            buttons[0].transform.localPosition = new Vector3(buttons[0].transform.localPosition.x, buttons[0].transform.localPosition.y - 100f, buttons[0].transform.localPosition.z);
-            moduleButtonGameObject.SetActive(true);
-            logicDiveActive = false;
-            logicDiveNumber = 0;
-            startingSoundEnabled = true;
-            memoryBankSeen = false;
-            GetComponent<KMBombModule>().HandleStrike();
-            DebugMsg("Strike! Took too long in logic dive.");
-            StartCoroutine(glitchEffect());
+            if (logicDiveNumber < 2)
+            {
+                logicDiveNotCorrectMats.Clear();
+                logicDiveCorrectButtonNum = Rnd.Range(0, 9);
+                for (int i = 0; i < 10; i++)
+                {
+                    if (logicDiveMats[i].name.Equals(memoryBanks[memoryBankNumber].ToString()))
+                    {
+                        logicDiveButtons[logicDiveCorrectButtonNum].material = logicDiveMats[i];
+                        for (int j = 0; j < 10; j++)
+                        {
+                            if (logicDiveMats[j] != logicDiveMats[i])
+                            {
+                                logicDiveNotCorrectMats.Add(logicDiveMats[j]);
+                            }
+                        }
+                        i = 10;
+                    }
+                }
+                for (int i = 0; i < 9; i++)
+                {
+                    if (i != logicDiveCorrectButtonNum)
+                    {
+                        logicDiveIndex = Rnd.Range(0, logicDiveNotCorrectMats.Count);
+                        logicDiveButtons[i].material = logicDiveNotCorrectMats[logicDiveIndex];
+                        logicDiveNotCorrectMats.RemoveAt(logicDiveIndex);
+                    }
+                }
+                if (logicDiveActive)
+                {
+                    Invoke("logicDive", 20);
+                }
+            }
+            else if (logicDiveActive) //just to be safe
+            {
+                logicDiveGameObject.transform.localPosition = new Vector3(logicDiveGameObject.transform.localPosition.x, logicDiveGameObject.transform.localPosition.y + 100f, logicDiveGameObject.transform.localPosition.z);
+                buttons[0].transform.localPosition = new Vector3(buttons[0].transform.localPosition.x, buttons[0].transform.localPosition.y - 100f, buttons[0].transform.localPosition.z);
+                moduleButtonGameObject.SetActive(true);
+                logicDiveActive = false;
+                logicDiveNumber = 0;
+                startingSoundEnabled = true;
+                memoryBankSeen = false;
+                GetComponent<KMBombModule>().HandleStrike();
+                DebugMsg("Strike! Took too long in logic dive.");
+                StartCoroutine(glitchEffect());
+            }
         }
     }
 
@@ -513,6 +587,7 @@ public class script : MonoBehaviour
     {
         moduleDetermined = true;
         whichModule = Rnd.Range(0,5);
+        whichModule = 4;
         Invoke(moduleVoids[whichModule], 0.1f);
     }
 
@@ -522,6 +597,10 @@ public class script : MonoBehaviour
         {
             moduleDown = true;
             threeWiresGameObject.transform.localPosition = new Vector3(threeWiresGameObject.transform.localPosition.x, threeWiresGameObject.transform.localPosition.y - 100f, threeWiresGameObject.transform.localPosition.z);
+        }
+        for(int i = 0; i < 3; i++)
+        {
+            cutWires[i] = false;
         }
         foreach(Renderer wire in wires)
         {
@@ -766,9 +845,9 @@ public class script : MonoBehaviour
         
     }
 
-    /*private bool isCommandValid(string cmd)
+    private bool isCommandValid(string cmd)
     {
-        string[] validbtns = { "1", "2", "3", "4" };
+        string[] validbtns = { "logic", "cut", "press", "tap", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
         var parts = cmd.ToLowerInvariant().Split(new[] { ' ' });
 
@@ -778,35 +857,215 @@ public class script : MonoBehaviour
             {
                 return false;
             }
+            else if (btn.ToLower() == "4" || btn.ToLower() == "5" || btn.ToLower() == "6")
+            {
+                tpNumHigherThanThree = true;
+            }
+            else if (btn.ToLower() == "7" || btn.ToLower() == "8" || btn.ToLower() == "9")
+            {
+                tpNumHigherThanSix = true;
+            }
         }
         return true;
     }
 
-    public string TwitchHelpMessage = "Use !{0} i am a help message >:3";
+#pragma warning disable 414
+    public string TwitchHelpMessage = "!{0} tap to tap the module before the logic dive. !{0} logic 1-9 to tap the button in that position in reading order. !{0} cut 1-3 to cut wires (Three Wires). !{0} press/tap 1-6 to press a button (Colored Buttons/Punctuation Buttons/Colored Piano/Colorful Message).  Commands that are related to a selected module after a logic dive can be chained. To press the small button in Colorful Message, do !{0} message.";
+#pragma warning restore 414
     IEnumerator ProcessTwitchCommand(string cmd)
     {
+        tpNumHigherThanThree = false;
+        tpNumHigherThanSix = false;
+        TPActive = true;
         var parts = cmd.ToLowerInvariant().Split(new[] { ' ' });
-
-        if (isCommandValid(cmd))
+        if(parts.Count() == 1 && parts[0] == "tap")
+        {
+            if(logicDiveActive || moduleDetermined)
+            {
+                yield return "sendtochat I'm not in a state to do this right now.";
+                yield break;
+            }
+            else
+            {
+                yield return null;
+                yield return new KMSelectable[] { buttons[0] };
+            }
+        }
+        else if(parts.Count() == 1 && parts[0] == "message" && whichModule == 4 && !messageDisplayButtonPressed)
         {
             yield return null;
-            for (int i = 0; i < parts.Count(); i++)
+            DebugMsg("M");
+            yield return new KMSelectable[] { buttons[37] };
+        }
+        else if (isCommandValid(cmd))
+        {
+            if(parts[0] == "logic")
             {
-                if (parts[i].Equals(1))
+                if(parts.Count() > 2)
                 {
-                    yield return new KMSelectable[] { buttons[0] };
+                    yield return "sendtochat Logic Dive cannot press more than 1 button.";
+                    yield break;
                 }
-                else if (parts[i].Equals(2))
+                else if(moduleDetermined || !logicDiveActive)
                 {
-                    yield return new KMSelectable[] { buttons[1] };
+                    yield return "sendtochat I'm not in a state to do this right now.";
+                    yield break;
                 }
-                else if (parts[i].Equals(3))
+                else
                 {
-                    yield return new KMSelectable[] { buttons[2] };
+                    for(int i = 0; i < 9; i++)
+                    {
+                        if((i + 1).ToString() == parts[1])
+                        {
+                            yield return null;
+                            yield return new KMSelectable[] { buttons[i + 1] };
+                        }
+                    }
                 }
-                else if (parts[i].Equals(4))
+            }
+            else if(!moduleDetermined)
+            {
+                yield return "sendtochat I'm not in a state to do this right now.";
+                yield break;
+            }
+            else if(parts[0] == "cut")
+            {
+                if(whichModule == 0)
                 {
-                    yield return new KMSelectable[] { buttons[3] };
+                    if(tpNumHigherThanThree || tpNumHigherThanSix)
+                    {
+                        yield return "sendtochat I don't have any wires that are in a position higher than 3!";
+                        yield break;
+                    }
+                    else
+                    {
+                        for(int i = 0; i < (parts.Count() - 1); i++)
+                        {
+                            for (int j = 0; j < 3; j++)
+                            {
+                                if ((j + 1).ToString() == parts[i + 1])
+                                {
+                                    yield return null;
+                                    yield return new KMSelectable[] { buttons[j + 10] };
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    yield return "sendtochat My selected module is not Three Wires!";
+                    yield break;
+                }
+            }
+            else if(parts[0] == "press" || parts[0] == "tap")
+            {
+                if(whichModule == 1)
+                {
+                    if(parts.Count() > 3)
+                    {
+                        yield return "sendtochat Colored Buttons can only press 2 buttons!";
+                        yield break;
+                    }
+                    else if (tpNumHigherThanSix)
+                    {
+                        yield return "sendtochat I don't have any buttons that are in a position higher than 6!";
+                        yield break;
+                    }
+                    else
+                    {
+                        for (int i = 0; i < (parts.Count() - 1); i++)
+                        {
+                            for (int j = 0; j < 6; j++)
+                            {
+                                if ((j + 1).ToString() == parts[i + 1])
+                                {
+                                    yield return null;
+                                    yield return new KMSelectable[] { buttons[j + 13] };
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (whichModule == 2)
+                {
+                    if (parts.Count() > 2)
+                    {
+                        yield return "sendtochat Punctuation Buttons can only press 1 button!";
+                        yield break;
+                    }
+                    else if (tpNumHigherThanSix)
+                    {
+                        yield return "sendtochat I don't have any buttons that are in a position higher than 6!";
+                        yield break;
+                    }
+                    else
+                    {
+                        for (int j = 0; j < 6; j++)
+                        {
+                            if ((j + 1).ToString() == parts[1])
+                            {
+                                yield return null;
+                                yield return new KMSelectable[] { buttons[j + 19] };
+                            }
+                        }
+                    }
+                }
+                else if (whichModule == 3)
+                {
+                    if (parts.Count() > 2)
+                    {
+                        yield return "sendtochat Colored Piano can only press 1 key!";
+                        yield break;
+                    }
+                    else if (tpNumHigherThanSix)
+                    {
+                        yield return "sendtochat I don't have any keys that are in a position higher than 6!";
+                        yield break;
+                    }
+                    else
+                    {
+                        for (int j = 0; j < 6; j++)
+                        {
+                            if ((j + 1).ToString() == parts[1])
+                            {
+                                yield return null;
+                                yield return new KMSelectable[] { buttons[j + 25] };
+                            }
+                        }
+                    }
+                }
+                else if (whichModule == 4)
+                {
+                    if (parts.Count() > 7)
+                    {
+                        yield return "sendtochat Colorful Message can only press 6 buttons!";
+                        yield break;
+                    }
+                    else if (tpNumHigherThanSix)
+                    {
+                        yield return "sendtochat I don't have any buttons that are in a position higher than 6!";
+                        yield break;
+                    }
+                    else
+                    {
+                        for (int i = 0; i < (parts.Count() - 1); i++)
+                        {
+                            for (int j = 0; j < 6; j++)
+                            {
+                                if ((j + 1).ToString() == parts[i + 1])
+                                {
+                                    yield return null;
+                                    yield return new KMSelectable[] { buttons[j + 31] };
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    yield return "sendtochat My module is Three Wires!";
+                    yield break;
                 }
             }
         }
@@ -814,7 +1073,7 @@ public class script : MonoBehaviour
         {
             yield break;
         }
-    }*/
+    }
 
     void DebugMsg(string msg)
     {
