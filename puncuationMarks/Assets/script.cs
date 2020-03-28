@@ -284,6 +284,7 @@ public class script : MonoBehaviour
                         logicDiveGameObject.SetActive(true);
                         memoryBankText.text = "";
                         DebugMsg("Going into logic dive...");
+                        logicDiveNumber = 0;
                         logicDiveActive = true;
                         logicDive();
                     }
@@ -469,6 +470,8 @@ public class script : MonoBehaviour
                                     {
                                         DebugMsg("Strike! Pressed letter " + messageLetters[i].text + ", while the correct letter was " + messageSelectedString[messageSelectedWordsChart[memoryBankColumn, messageButtonPresses]]);
                                         GetComponent<KMBombModule>().HandleStrike();
+                                        messageDisplayButton.SetActive(true);
+                                        messageDisplayButtonPressed = false;
                                         colorfulMessage();
                                     }
                                 }
@@ -587,7 +590,6 @@ public class script : MonoBehaviour
     {
         moduleDetermined = true;
         whichModule = Rnd.Range(0,5);
-        whichModule = 4;
         Invoke(moduleVoids[whichModule], 0.1f);
     }
 
