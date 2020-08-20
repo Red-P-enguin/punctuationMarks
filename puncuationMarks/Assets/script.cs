@@ -14,7 +14,15 @@ public class script : MonoBehaviour
     private bool moduleSolved = false;
     private bool incorrect = false;
 
-    public KMSelectable[] buttons;
+    public KMSelectable moduleButton;
+    public KMSelectable[] logicButtons;
+    public KMSelectable[] wireSelectables;
+    public KMSelectable[] colorButtons;
+    public KMSelectable[] punctuationButtons;
+    public KMSelectable[] pianoButtons;
+    public KMSelectable[] messageButtons;
+    public KMSelectable messagePlayButton;
+
     //glitch effects
     public Color[] glitchColors;
     public SpriteRenderer[] glitchSquares;
@@ -42,7 +50,6 @@ public class script : MonoBehaviour
     public GameObject moduleButtonGameObject;
     //logic dive
     private bool logicDiveActive = false;
-    private int logicDiveNumber = 0;
     public GameObject logicDiveGameObject;
     public Material[] logicDiveMats;
     private List<Material> logicDiveNotCorrectMats = new List<Material>();
@@ -52,27 +59,26 @@ public class script : MonoBehaviour
     //general second-half module stuff
     private int whichModule = 0;
     public Material[] notMemoryBankMats;
-    private string[] moduleVoids = { "threeWires", "coloredButtons", "puncuationButtons","coloredPiano","colorfulMessage" };
-    private bool moduleDown = false;
+    private string[] moduleVoids = { "threeWires", "coloredButtons", "puncuationButtons", "coloredPiano", "colorfulMessage" };
     //three wires
     public Renderer[] wires;
     public GameObject threeWiresGameObject;
     public Mesh[] wireCondition;
-    private string[] wirescolors = { "Crimson","Brown","Dark Yellow","Green","Blue","Magenta" };
-    private string[] wireCombinations = { "123", "132", "213", "231", "312", "213", "123", "312", "132", "321",
-                                          "132", "321", "123", "312", "213", "231", "321", "132", "123", "231",
-                                          "213", "123", "312", "321", "231", "132", "312", "231", "213", "123",
-                                          "231", "312", "132", "213", "123", "321", "231", "123", "321", "213",
-                                          "312", "231", "321", "132", "321", "123", "213", "321", "312", "132",
-                                          "321", "213", "231", "123", "132", "312", "132", "213", "231", "312" };
-    private int wireIndex = 0;  
+    private string[] wirescolors = { "Crimson", "Brown", "Dark Yellow", "Green", "Blue", "Magenta" };
+    private string[,] wireCombinations = new string[6, 10] { { "123", "132", "213", "231", "312", "213", "123", "312", "132", "321" },
+                                          { "132", "321", "123", "312", "213", "231", "321", "132", "123", "231" },
+                                          { "213", "123", "312", "321", "231", "132", "312", "231", "213", "123" },
+                                          { "231", "312", "132", "213", "123", "321", "231", "123", "321", "213" },
+                                          { "312", "231", "321", "132", "321", "123", "213", "321", "312", "132" },
+                                          { "321", "213", "231", "123", "132", "312", "132", "213", "231", "312" } };
+    private int wireIndex = 0;
     private int nextWire = 0;
     private bool[] cutWires = { false, false, false };
     //colored buttons
     public GameObject coloredButtonsGameObject;
     public Renderer[] coloredButtonss;
     private int[,] firstButtonPresses = { { 4, 5, 3, 6, 1, 2, 5, 6, 3, 4 }, { 4, 1, 6, 2, 2, 1, 5, 2, 6, 6 }, { 4, 5, 5, 4, 3, 3, 5, 3, 6, 1 }, { 5, 5, 2, 6, 5, 2, 5, 4, 4, 4 }, { 2, 6, 2, 3, 1, 4, 1, 1, 6, 6 }, { 1, 3, 3, 1, 2, 4, 6, 2, 3, 3 } };
-    private int[,] secondButtonPresses = { { 3,4,3,1,1,1,1,1,4,3 },{ 5,5,4,1,6,5,6,6,2,4 },{ 5,2,1,2,1,2,3,4,2,4 },{ 5,3,5,6,6,3,2,4,2,6 },{ 3,5,4,5,4,6,2,6,5,3 },{ 3,1,6,6,2,1,3,4,2,6 } };
+    private int[,] secondButtonPresses = { { 3, 4, 3, 1, 1, 1, 1, 1, 4, 3 }, { 5, 5, 4, 1, 6, 5, 6, 6, 2, 4 }, { 5, 2, 1, 2, 1, 2, 3, 4, 2, 4 }, { 5, 3, 5, 6, 6, 3, 2, 4, 2, 6 }, { 3, 5, 4, 5, 4, 6, 2, 6, 5, 3 }, { 3, 1, 6, 6, 2, 1, 3, 4, 2, 6 } };
     private int buttonIndex = 0;
     private int buttonWhichButton = 0;
     private int buttonColor = 0;
@@ -84,49 +90,50 @@ public class script : MonoBehaviour
     public GameObject punctuationGameObject;
     public TextMesh[] punctuationText;
     public Renderer punctuationDisplay;
-    //Qs respresent " because the character " ends the string
-    private string[] punctuationList = { "!,.", "Q.?", "Q!?", ".!,", ",Q.", ".!Q", ",.?", ",.Q", ",?.", "!?.",
-                                         "Q,!", ".?,", "!,Q", ".,Q", "?,.", "Q?!", "?.Q", "?Q.", "?!.", "!?Q",
-                                         ",.Q", "?.,", ".!,", "!,Q", "Q,!", "!?,", "!?.", "Q!.", "!,Q", "Q!?",
-                                         "!?.", "!.?", ".Q,", ",!Q", "Q.,", "Q.,", "?Q,", "!?,", "Q?!", "?!.",
-                                         "?!,", "?!.", "?.,", ",!.", "?.Q", "!,?", "?!Q", "?,!", "!.Q", "?,.",
-                                         ",Q?", ".Q!", "?,!", ".?!", ".!Q", "Q.?", ".!Q", ".!?", "?,Q", "Q.?", };
+    private string[,] punctuationList = new string[6, 10] { { "!,.", "\".?", "\"!?", ".!,", ",\".", ".!\"", ",.?", ",.\"", ",?.", "!?.", },
+                                         { "\",!", ".?,", "!,\"", ".,\"", "?,.", "\"?!", "?.\"", "?\".", "?!.", "!?\"", },
+                                         { ",.\"", "?.,", ".!,", "!,\"", "\",!", "!?,", "!?.", "\"!.", "!,\"", "\"!?", },
+                                         { "!?.", "!.?", ".\",", ",!\"", "\".,", "\".,", "?\",", "!?,", "\"?!", "?!.", },
+                                         { "?!,", "?!.", "?.,", ",!.", "?.\"", "!,?", "?!\"", "?,!", "!.\"", "?,.", },
+                                         { ",\"?", ".\"!", "?,!", ".?!", ".!\"", "\".?", ".!\"", ".!?", "?,\"", "\".?" } };
     private string correctText;
     private int correctTextButton = 0;
     private int displayMat = 0;
     private int[] randomNums = new int[2];
-    private List<int> takenPunctuations1 = new List<int>();
-    private List<int> takenPunctuations2 = new List<int>();
+    private List<string> takenPunctuations = new List<string>();
     //colored piano
     public GameObject pianoGameObject;
     public Renderer[] pianoKeys;
     private int pianoCorrectButton;
-    private int[] pianoKeyColorPositions = { 0,3,5,4,0,2,4,1,4,2,
-                                             1,2,4,3,1,4,0,2,5,3,
-                                             2,4,1,0,5,1,2,0,3,4,
-                                             3,0,3,2,4,5,5,5,1,0,
-                                             4,5,2,1,3,0,1,3,0,5,
-                                             5,1,0,5,2,3,3,4,2,1 };
-    private char[] pianoKeyNames = { 'C','D','E','F','G','A' };
+    private int[,] pianoKeyColorPositions = { { 0,3,5,4,0,2,4,1,4,2, },
+                                             { 1,2,4,3,1,4,0,2,5,3, },
+                                             { 2,4,1,0,5,1,2,0,3,4, },
+                                             { 3,0,3,2,4,5,5,5,1,0, },
+                                             { 4,5,2,1,3,0,1,3,0,5, },
+                                             { 5,1,0,5,2,3,3,4,2,1 } };
+    private char[] pianoKeyNames = { 'C', 'D', 'E', 'F', 'G', 'A' };
     private List<int> pianoMaterialNums = new List<int>();
-    private int[] pianoChosenMats = { 6,6,6,6,6,6 };
-    private int pianoIndex = 0;
+    private List<int> pianoChosenMats = new List<int>();
+    private int pianoCorrectMaterialNum = 0;
+
+    private int[] pianoKeyNums = new int[6] { 6,6,6,6,6,6 };
+    private int[] pianoPlaceholders = new int[2];
     //colorful message
     public GameObject messageGameObject;
     public GameObject messageDisplayButton;
     public Renderer messageDispaly;
     public TextMesh[] messageLetters;
     public Material messageBlackMat;
-    private int[,] messageWords1 = 
-      { { 3,1,4,5,0,2 }, 
-        { 0,1,4,5,2,3 }, 
-        { 1,0,2,5,3,4 }, 
-        { 2,3,4,0,5,1 }, 
-        { 1,3,4,0,2,5 }, 
-        { 2,1,3,4,0,5 }, 
-        { 5,3,0,1,4,2 }, 
-        { 5,0,1,4,2,3 }, 
-        { 0,4,3,2,5,1 }, 
+    private int[,] messageWords1 =
+      { { 3,1,4,5,0,2 },
+        { 0,1,4,5,2,3 },
+        { 1,0,2,5,3,4 },
+        { 2,3,4,0,5,1 },
+        { 1,3,4,0,2,5 },
+        { 2,1,3,4,0,5 },
+        { 5,3,0,1,4,2 },
+        { 5,0,1,4,2,3 },
+        { 0,4,3,2,5,1 },
         { 4,3,5,2,1,0 } };
     private int[,] messageWords2 =
       { { 2,0,3,1,5,4 },
@@ -185,21 +192,61 @@ public class script : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        logicDiveGameObject.SetActive(false);
+        messageGameObject.SetActive(false);
+        pianoGameObject.SetActive(false);
+        punctuationGameObject.SetActive(false);
+        threeWiresGameObject.SetActive(false);
+        coloredButtonsGameObject.SetActive(false);
+    }
+
     // Update is called once per frame
     void Awake()
     {
         StartCoroutine(glitchEffect());
         ModuleId = ModuleIdCounter++;
 
-        foreach (KMSelectable button in buttons)
+        GetComponent<KMBombModule>().OnActivate += OnActivate;
+
+        moduleButton.OnInteract += delegate () { modulePressed(); return false; };
+        messagePlayButton.OnInteract += delegate () { playMessage(); return false; };
+        for (int i = 0; i < 9; i++)
         {
-            KMSelectable pressedButton = button;
-            button.OnInteract += delegate () { buttonPressed(pressedButton); return false; };
+            int dummy = i;
+            logicButtons[dummy].OnInteract += delegate () { logicPressed(dummy); return false; };
+        }
+        for (int i = 0; i < 3; i++)
+        {
+            int dummy = i;
+            wireSelectables[dummy].OnInteract += delegate () { wireCut(dummy); return false; };
+        }
+        for (int i = 0; i < 6; i++)
+        {
+            int dummy = i;
+            colorButtons[dummy].OnInteract += delegate () { coloredButtonPressed(dummy); return false; };
+        }
+        for (int i = 0; i < 6; i++)
+        {
+            int dummy = i;
+            punctuationButtons[dummy].OnInteract += delegate () { punctuationPressed(dummy); return false; };
+        }
+        for (int i = 0; i < 6; i++)
+        {
+            int dummy = i;
+            pianoButtons[dummy].OnInteract += delegate () { pianoPressed(dummy); return false; };
+        }
+        for (int i = 0; i < 6; i++)
+        {
+            int dummy = i;
+            messageButtons[dummy].OnInteract += delegate () { messagePressed(dummy); return false; };
         }
     }
 
     private IEnumerator glitchEffect()
     {
+        yield return true;
         if (!bombStarted)
         {
             audio.PlaySoundAtTransform("glitch" + Rnd.Range(1, 6), transform);
@@ -223,272 +270,213 @@ public class script : MonoBehaviour
         memoryBankText.text = "";
     }
 
-    void buttonPressed(KMSelectable pressedButton)
+    void modulePressed()
     {
-        pressedButton.AddInteractionPunch();
-        GetComponent<KMAudio>().PlayGameSoundAtTransformWithRef(KMSoundOverride.SoundEffect.ButtonPress, transform);
-
-        incorrect = false;
-
-        if (moduleSolved)
+        if (startingSoundEnabled && !moduleDetermined)
         {
-            return;
+            startingSoundEnabled = false;
+            audio.PlaySoundAtTransform("beginningNoise", transform);
         }
-        else
+        else if (!memoryBankSeen)
         {
-            for (int j = 0; j < glitchSquares.Count(); j++)
+            bombStarted = false;
+            StartCoroutine(glitchEffect());
+            memoryBankNumber = Rnd.Range(0, 100);
+            if (memoryBankNumber < 10)
             {
-                glitchSquares[j].color = glitchColors[8];
-            }
-            if (startingSoundEnabled && !moduleDetermined)
-            {
-                startingSoundEnabled = false;
-                audio.PlaySoundAtTransform("beginningNoise", transform);
+                memoryBankText.text = "0" + memoryBankNumber;
+                DebugMsg("The displayed number is " + 0 + memoryBankNumber + ".");
             }
             else
             {
-                if (!memoryBankSeen)
+                memoryBankText.text = "" + memoryBankNumber;
+                DebugMsg("The displayed number is " + memoryBankNumber + ".");
+            }
+            memoryBankColor = memoryBanks[memoryBankNumber];
+            for (int i = 0; i < 10; i++)
+            {
+                if (memoryBanks[i] == memoryBankColor)
                 {
-                    bombStarted = false;
-                    StartCoroutine(glitchEffect());
-                    memoryBankNumber = Rnd.Range(0, 100);
-                    if (memoryBankNumber < 10)
-                    {
-                        memoryBankText.text = "0" + memoryBankNumber;
-                        DebugMsg("The displayed number is " + 0 + memoryBankNumber + ".");
-                    }
-                    else
-                    {
-                        memoryBankText.text = "" + memoryBankNumber;
-                        DebugMsg("The displayed number is " + memoryBankNumber + ".");
-                    }
-                    memoryBankColor = memoryBanks[memoryBankNumber];
-                    for(int i = 0; i < 10; i++)
-                    {
-                        if(memoryBanks[i] == memoryBankColor)
-                        {
-                            memoryBankColumn = i;
-                            i = 10;
-                        }
-                    }
-                    memoryBankSeen = true;
-                    Invoke("memoryBankTextGoByeBye", 3);
+                    memoryBankColumn = i;
+                    break;
                 }
-                else if (!moduleDetermined)
-                {
-                    if (!logicDiveActive)
-                    {
-                        logicDiveGameObject.transform.localPosition = new Vector3(logicDiveGameObject.transform.localPosition.x, logicDiveGameObject.transform.localPosition.y - 100f, logicDiveGameObject.transform.localPosition.z);
-                        buttons[0].transform.localPosition = new Vector3(buttons[0].transform.localPosition.x, buttons[0].transform.localPosition.y + 100f, buttons[0].transform.localPosition.z);
-                        moduleButtonGameObject.SetActive(false);
-                        logicDiveGameObject.SetActive(true);
-                        memoryBankText.text = "";
-                        DebugMsg("Going into logic dive...");
-                        logicDiveNumber = 0;
-                        logicDiveActive = true;
-                        logicDive();
-                    }
-                    else
-                    {
-                        logicDiveGameObject.transform.localPosition = new Vector3(logicDiveGameObject.transform.localPosition.x, logicDiveGameObject.transform.localPosition.y + 100f, logicDiveGameObject.transform.localPosition.z);
-                        logicDiveGameObject.SetActive(false);
-                        for (int i = 0; i < 9; i++)
-                        {
-                            if(buttons[i + 1] == pressedButton)
-                            {
-                                if(i != logicDiveCorrectButtonNum)
-                                {
-                                    incorrect = true;
-                                }
-                                i = 9;
-                            }
-                        }
-                        if (!incorrect)
-                        {
-                            logicDiveActive = false;
-                            StartCoroutine(glitchEffect());
-                            DebugMsg("Logic Dive completed successfully. Remembering module...");
-                            determineModule();
-                        }
-                        else
-                        {
-                            buttons[0].transform.localPosition = new Vector3(buttons[0].transform.localPosition.x, buttons[0].transform.localPosition.y - 100f, buttons[0].transform.localPosition.z);
-                            moduleButtonGameObject.SetActive(true);
-                            GetComponent<KMBombModule>().HandleStrike();
-                            DebugMsg("Strike! Pressed incorrect button.");
-                            logicDiveActive = false;
-                            logicDiveNumber = 0;
-                            startingSoundEnabled = true;
-                            memoryBankSeen = false;
-                            incorrect = false;
-                            StartCoroutine(glitchEffect());
-                        }
-                    }
-                }
-                else
-                {
-                    if (whichModule == 0) //3 wires
-                    {
-                        for (int i = 0; i < 3; i++)
-                        {
-                            if(buttons[10 + i] == pressedButton && !cutWires[i])
-                            {
-                                cutWires[i] = true;
-                                wires[i].GetComponent<MeshFilter>().mesh = wireCondition[1];
-                                if (wireCombinations[memoryBankColumn + (wireIndex * 10)][nextWire].ToString() != (i + 1).ToString())
-                                {
-                                    DebugMsg("Strike! Pressed wire " + (i + 1) + ", while the correct wire was wire " + wireCombinations[memoryBankColumn + (wireIndex * 10)][nextWire] + ".");
-                                    incorrect = true;
-                                }
-                                else
-                                {
-                                    nextWire++;
-                                }
-                                i = 3;
-                            }
-                        }
-                        if (!incorrect && nextWire == 3)
-                        {
-                            DebugMsg("Module solved!");
-                            moduleSolved = true;
-                            GetComponent<KMBombModule>().HandlePass();
-                        }
-                        else if(incorrect)
-                        {
-                            GetComponent<KMBombModule>().HandleStrike();
-                            incorrect = false;
-                            nextWire = 0;
-                            threeWires();
-                        }
-                    }
-                    else if(whichModule == 1)
-                    {
-                        if(buttonsSecondStage)
-                        {
-                            StopAllCoroutines();
-                            if (pressedButton != buttons[(secondButtonPresses[buttonColor, memoryBankColumn]) + 12])
-                            {
-                                DebugMsg("Strike! Pressed button " + pressedButton.name + ", while the correct button for that stage was " + buttons[(firstButtonPresses[buttonColor, memoryBankColumn]) + 12].name + ".");
-                                GetComponent<KMBombModule>().HandleStrike();
-                                buttonsSecondStage = false;
-                                coloredButtons();
-                            }
-                            else
-                            {
-                                DebugMsg("Module solved!");
-                                moduleSolved = true;
-                                GetComponent<KMBombModule>().HandlePass();
-                            }
-                        }
-                        else
-                        {
-                            if (pressedButton != buttons[(firstButtonPresses[buttonColor, memoryBankColumn]) + 12])
-                            {
-                                StopAllCoroutines();
-                                DebugMsg("Strike! Pressed button " + pressedButton.name + ", while the correct button for that stage was " + buttons[(secondButtonPresses[buttonColor, memoryBankColumn]) + 12].name + ".");
-                                GetComponent<KMBombModule>().HandleStrike();
-                                buttonsSecondStage = false;
-                                coloredButtons();
-                            }
-                            else
-                            {
-                                buttonsSecondStage = true;
-                                DebugMsg("Correct button. Advancing to next stage.");
-                            }
-                        }
-                    }
-                    else if(whichModule == 2)
-                    {
-                        for(int i = 0; i < 6; i++)
-                        {
-                            if(pressedButton == buttons[i + 19])
-                            {
-                                if(i != correctTextButton)
-                                {
-                                    DebugMsg("Strike! Pressed button " + (i + 1) + ", while the correct button was " + (correctTextButton + 1) + ".");
-                                    GetComponent<KMBombModule>().HandleStrike();
-                                    puncuationButtons();
-                                }
-                                else
-                                {
-                                    DebugMsg("Module solved!");
-                                    moduleSolved = true;
-                                    GetComponent<KMBombModule>().HandlePass();
-                                }
-                                i = 6;
-                            }
-                        }
-                    }
-                    else if(whichModule == 3)
-                    {
-                        for(int i = 0; i < 6; i++)
-                        {
-                            if(pressedButton == buttons[i + 25])
-                            {
-                                if(i == pianoCorrectButton)
-                                {
-                                    DebugMsg("Module solved!");
-                                    moduleSolved = true;
-                                    GetComponent<KMBombModule>().HandlePass();
-                                }
-                                else
-                                {
-                                    DebugMsg("Strike! Pressed key " + pianoKeyNames[i] + ".");
-                                    GetComponent<KMBombModule>().HandleStrike();
-                                    puncuationButtons();
-                                }
-                            }
-                        }
-                    }
-                    else if(whichModule == 4)
-                    {
-                        if(pressedButton == buttons[37])
-                        {
-                            StopAllCoroutines();
-                            StartCoroutine(DisplayUpdater());
-                            messageDisplayButtonPressed = true;
-                            messageDisplayButton.SetActive(false);
-                        }
-                        else
-                        {
-                            for(int i = 0; i < 6; i++)
-                            {
-                                if(pressedButton == buttons[31 + i])
-                                {
-                                    if(messageLetters[i].text == ("" + messageSelectedString[messageSelectedWordsChart[memoryBankColumn, messageButtonPresses]]))
-                                    {
-                                        DebugMsg("Correct button pressed.");
-                                        messageButtonPresses++;
-                                        if(messageButtonPresses == 6)
-                                        {
-                                            DebugMsg("Module solved!");
-                                            moduleSolved = true;
-                                            GetComponent<KMBombModule>().HandlePass();
-                                        }
-                                    }
-                                    else
-                                    {
-                                        DebugMsg("Strike! Pressed letter " + messageLetters[i].text + ", while the correct letter was " + messageSelectedString[messageSelectedWordsChart[memoryBankColumn, messageButtonPresses]]);
-                                        GetComponent<KMBombModule>().HandleStrike();
-                                        messageDisplayButton.SetActive(true);
-                                        messageDisplayButtonPressed = false;
-                                        colorfulMessage();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            }
+            memoryBankSeen = true;
+            Invoke("memoryBankTextGoByeBye", 3);
+        }
+        else
+        {
+            moduleButtonGameObject.SetActive(false);
+            logicDiveGameObject.SetActive(true);
+            memoryBankText.text = "";
+            DebugMsg("Going into logic dive...");
+            logicDiveActive = true;
+            StartCoroutine(LogicDive());
+        }
+    }
+
+    void logicPressed(int index)
+    {
+        logicDiveActive = false;
+        logicDiveGameObject.SetActive(false);
+        if (index != logicDiveCorrectButtonNum)
+        {
+            moduleButtonGameObject.SetActive(true);
+            GetComponent<KMBombModule>().HandleStrike();
+            DebugMsg("Strike! Pressed incorrect button.");
+            startingSoundEnabled = true;
+            memoryBankSeen = false;
+            incorrect = false;
+            StartCoroutine(glitchEffect());
+        }
+        else
+        {
+            StartCoroutine(glitchEffect());
+            DebugMsg("Logic Dive completed successfully. Remembering module...");
+            determineModule();
+        }
+    }
+
+    void wireCut(int index)
+    {
+        if (!cutWires[index])
+        {
+            cutWires[index] = true;
+            wires[index].GetComponent<MeshFilter>().mesh = wireCondition[1];
+            if (wireCombinations[memoryBankColumn + wireIndex,nextWire] != (index + "1"))
+            {
+                DebugMsg("Strike! Pressed wire " + (index + 1) + ", while the correct wire was wire " + wireCombinations[memoryBankColumn + wireIndex,nextWire] + ".");
+                incorrect = true;
+            }
+            else
+            {
+                nextWire++;
+            }
+        }
+        if (!incorrect && nextWire == 3)
+        {
+            DebugMsg("Module solved!");
+            moduleSolved = true;
+            GetComponent<KMBombModule>().HandlePass();
+        }
+        else if (incorrect)
+        {
+            GetComponent<KMBombModule>().HandleStrike();
+            incorrect = false;
+            nextWire = 0;
+            threeWires();
+        }
+    }
+
+    void coloredButtonPressed(int index)
+    {
+        if (buttonsSecondStage)
+        {
+            StopAllCoroutines();
+            if (index != secondButtonPresses[buttonColor, memoryBankColumn])
+            {
+                DebugMsg("Strike! Pressed button " + colorButtons[index].name + ", while the correct button for that stage was " + colorButtons[firstButtonPresses[buttonColor, memoryBankColumn]].name + ".");
+                GetComponent<KMBombModule>().HandleStrike();
+                buttonsSecondStage = false;
+                coloredButtons();
+            }
+            else
+            {
+                DebugMsg("Module solved!");
+                moduleSolved = true;
+                GetComponent<KMBombModule>().HandlePass();
+            }
+        }
+        else
+        {
+            if (index != firstButtonPresses[buttonColor, memoryBankColumn])
+            {
+                StopAllCoroutines();
+                DebugMsg("Strike! Pressed button " + colorButtons[index].name + ", while the correct button for that stage was " + colorButtons[secondButtonPresses[buttonColor, memoryBankColumn]].name + ".");
+                GetComponent<KMBombModule>().HandleStrike();
+                buttonsSecondStage = false;
+                coloredButtons();
+            }
+            else
+            {
+                buttonsSecondStage = true;
+                DebugMsg("Correct button. Advancing to next stage.");
             }
         }
     }
 
-    void logicDive()
+    void punctuationPressed(int index)
     {
-        logicDiveNumber++;
-        if(!TPActive)
+        if (index != correctTextButton)
         {
-            if (logicDiveNumber < 7)
+            DebugMsg("Strike! Pressed button " + (index + 1) + ", while the correct button was " + (correctTextButton + 1) + ".");
+            GetComponent<KMBombModule>().HandleStrike();
+            puncuationButtons();
+        }
+        else
+        {
+            DebugMsg("Module solved!");
+            moduleSolved = true;
+            GetComponent<KMBombModule>().HandlePass();
+        }
+    }
+
+    void pianoPressed(int index)
+    {
+        if (index == pianoCorrectButton)
+        {
+            DebugMsg("Module solved!");
+            moduleSolved = true;
+            GetComponent<KMBombModule>().HandlePass();
+        }
+        else
+        {
+            DebugMsg("Strike! Pressed key " + pianoKeyNames[index] + ".");
+            GetComponent<KMBombModule>().HandleStrike();
+            coloredPiano();
+        }
+    }
+
+    void messagePressed(int index)
+    {
+        if(!messageDisplayButtonPressed)
+        {
+            return;
+        }
+        if (messageLetters[index].text == ("" + messageSelectedString[messageSelectedWordsChart[memoryBankColumn, messageButtonPresses]]))
+        {
+            DebugMsg("Correct button pressed.");
+            messageButtonPresses++;
+            if (messageButtonPresses == 6)
+            {
+                DebugMsg("Module solved!");
+                moduleSolved = true;
+                GetComponent<KMBombModule>().HandlePass();
+            }
+        }
+        else
+        {
+            DebugMsg("Strike! Pressed letter " + messageLetters[index].text + ", while the correct letter was " + messageSelectedString[messageSelectedWordsChart[memoryBankColumn, messageButtonPresses]]);
+            GetComponent<KMBombModule>().HandleStrike();
+            messageDisplayButton.SetActive(true);
+            messageDisplayButtonPressed = false;
+            colorfulMessage();
+        }
+    }
+
+    void playMessage()
+    {
+        StopAllCoroutines();
+        StartCoroutine(DisplayUpdater());
+        messageDisplayButtonPressed = true;
+        messageDisplayButton.SetActive(false);
+    }
+
+    private IEnumerator LogicDive()
+    {
+        if (!TPActive)
+        {
+            for (int k = 0; k < 6; k++)
             {
                 logicDiveNotCorrectMats.Clear();
                 logicDiveCorrectButtonNum = Rnd.Range(0, 9);
@@ -499,12 +487,12 @@ public class script : MonoBehaviour
                         logicDiveButtons[logicDiveCorrectButtonNum].material = logicDiveMats[i];
                         for (int j = 0; j < 10; j++)
                         {
-                            if (logicDiveMats[j] != logicDiveMats[i])
+                            if (i != j)
                             {
                                 logicDiveNotCorrectMats.Add(logicDiveMats[j]);
                             }
                         }
-                        i = 10;
+                        break;
                     }
                 }
                 for (int i = 0; i < 9; i++)
@@ -518,69 +506,63 @@ public class script : MonoBehaviour
                 }
                 if (logicDiveActive)
                 {
-                    Invoke("logicDive", 1);
+                    yield return new WaitForSeconds(1f);
+                }
+                else
+                {
+                    k = 6;
                 }
             }
-            else if (logicDiveActive) //just to be safe
+            if (logicDiveActive) //just to be safe
             {
-                logicDiveGameObject.transform.localPosition = new Vector3(logicDiveGameObject.transform.localPosition.x, logicDiveGameObject.transform.localPosition.y + 100f, logicDiveGameObject.transform.localPosition.z);
-                buttons[0].transform.localPosition = new Vector3(buttons[0].transform.localPosition.x, buttons[0].transform.localPosition.y - 100f, buttons[0].transform.localPosition.z);
                 moduleButtonGameObject.SetActive(true);
                 logicDiveActive = false;
-                logicDiveNumber = 0;
                 startingSoundEnabled = true;
                 memoryBankSeen = false;
                 GetComponent<KMBombModule>().HandleStrike();
                 DebugMsg("Strike! Took too long in logic dive.");
+                logicDiveGameObject.SetActive(false);
                 StartCoroutine(glitchEffect());
             }
         }
         else
         {
-            if (logicDiveNumber < 2)
+            logicDiveNotCorrectMats.Clear();
+            logicDiveCorrectButtonNum = Rnd.Range(0, 9);
+            for (int i = 0; i < 10; i++)
             {
-                logicDiveNotCorrectMats.Clear();
-                logicDiveCorrectButtonNum = Rnd.Range(0, 9);
-                for (int i = 0; i < 10; i++)
+                if (logicDiveMats[i].name.Equals(memoryBanks[memoryBankNumber].ToString()))
                 {
-                    if (logicDiveMats[i].name.Equals(memoryBanks[memoryBankNumber].ToString()))
+                    logicDiveButtons[logicDiveCorrectButtonNum].material = logicDiveMats[i];
+                    for (int j = 0; j < 10; j++)
                     {
-                        logicDiveButtons[logicDiveCorrectButtonNum].material = logicDiveMats[i];
-                        for (int j = 0; j < 10; j++)
+                        if (logicDiveMats[j] != logicDiveMats[i])
                         {
-                            if (logicDiveMats[j] != logicDiveMats[i])
-                            {
-                                logicDiveNotCorrectMats.Add(logicDiveMats[j]);
-                            }
+                            logicDiveNotCorrectMats.Add(logicDiveMats[j]);
                         }
-                        i = 10;
                     }
-                }
-                for (int i = 0; i < 9; i++)
-                {
-                    if (i != logicDiveCorrectButtonNum)
-                    {
-                        logicDiveIndex = Rnd.Range(0, logicDiveNotCorrectMats.Count);
-                        logicDiveButtons[i].material = logicDiveNotCorrectMats[logicDiveIndex];
-                        logicDiveNotCorrectMats.RemoveAt(logicDiveIndex);
-                    }
-                }
-                if (logicDiveActive)
-                {
-                    Invoke("logicDive", 20);
+                    break;
                 }
             }
-            else if (logicDiveActive) //just to be safe
+            for (int i = 0; i < 9; i++)
             {
-                logicDiveGameObject.transform.localPosition = new Vector3(logicDiveGameObject.transform.localPosition.x, logicDiveGameObject.transform.localPosition.y + 100f, logicDiveGameObject.transform.localPosition.z);
-                buttons[0].transform.localPosition = new Vector3(buttons[0].transform.localPosition.x, buttons[0].transform.localPosition.y - 100f, buttons[0].transform.localPosition.z);
+                if (i != logicDiveCorrectButtonNum)
+                {
+                    logicDiveIndex = Rnd.Range(0, logicDiveNotCorrectMats.Count);
+                    logicDiveButtons[i].material = logicDiveNotCorrectMats[logicDiveIndex];
+                    logicDiveNotCorrectMats.RemoveAt(logicDiveIndex);
+                }
+            }
+            yield return new WaitForSeconds(15f);
+            if (logicDiveActive) //just to be safe
+            {
                 moduleButtonGameObject.SetActive(true);
                 logicDiveActive = false;
-                logicDiveNumber = 0;
                 startingSoundEnabled = true;
                 memoryBankSeen = false;
                 GetComponent<KMBombModule>().HandleStrike();
                 DebugMsg("Strike! Took too long in logic dive.");
+                logicDiveGameObject.SetActive(false);
                 StartCoroutine(glitchEffect());
             }
         }
@@ -595,11 +577,7 @@ public class script : MonoBehaviour
 
     void threeWires()
     {
-        if(!moduleDown)
-        {
-            moduleDown = true;
-            threeWiresGameObject.transform.localPosition = new Vector3(threeWiresGameObject.transform.localPosition.x, threeWiresGameObject.transform.localPosition.y - 100f, threeWiresGameObject.transform.localPosition.z);
-        }
+        threeWiresGameObject.SetActive(true);
         for(int i = 0; i < 3; i++)
         {
             cutWires[i] = false;
@@ -627,11 +605,7 @@ public class script : MonoBehaviour
         {
             buttonNotUsedMats.Add(notMemoryBankMats[i]);
         }
-        if (!moduleDown)
-        {
-            moduleDown = true;
-            coloredButtonsGameObject.transform.localPosition = new Vector3(threeWiresGameObject.transform.localPosition.x, threeWiresGameObject.transform.localPosition.y - 100f, threeWiresGameObject.transform.localPosition.z);
-        }
+        coloredButtonsGameObject.SetActive(true);
         buttonWhichButton = Rnd.Range(0,6);
         foreach (Renderer button in coloredButtonss)
         {
@@ -647,7 +621,7 @@ public class script : MonoBehaviour
                     {
                         buttonColor = i;
                         DebugMsg("The flashing button's color is " + wirescolors[buttonColor] + ".");
-                        i = 6;
+                        break;
                     }
                 }
                 buttonNotUsedMats.RemoveAt(buttonIndex);
@@ -675,127 +649,97 @@ public class script : MonoBehaviour
 
     void puncuationButtons()
     {
-        if (!moduleDown)
-        {
-            moduleDown = true;
-            punctuationGameObject.transform.localPosition = new Vector3(punctuationGameObject.transform.localPosition.x, punctuationGameObject.transform.localPosition.y - 100f, punctuationGameObject.transform.localPosition.z);
-        }
-        takenPunctuations1.Clear();
-        takenPunctuations2.Clear();
+        punctuationGameObject.SetActive(true);
+        takenPunctuations.Clear();
         correctTextButton = Rnd.Range(0,6);
-        correctText = "";
+        correctText = punctuationList[Rnd.Range(0, 6) , memoryBankColumn];
         displayMat = Rnd.Range(0,6);
         punctuationDisplay.material = notMemoryBankMats[displayMat];
-        for (int j = 0; j < 3; j++)
-        {
-            if (punctuationList[(displayMat * 10) + memoryBankColumn][j] == 'Q')
-            {
-                correctText = correctText + '"';
-            }
-            else
-            {
-                correctText = correctText + punctuationList[(displayMat * 10) + memoryBankColumn][j];
-            }
-        }
         DebugMsg("The display's color is " + wirescolors[displayMat] + ".");
         DebugMsg("The correct punctuation marks are " + correctText);
-        foreach (TextMesh text in punctuationText)
+        takenPunctuations.Add(correctText);
+        for (int i = 0; i < 6; i++)
         {
-            text.text = "";
-            if(text == punctuationText[correctTextButton])
+            if (i == correctTextButton)
             {
-                for(int j = 0; j < 3; j++)
-                {
-                    text.text = correctText;
-                }
+                punctuationText[i].text = correctText;
             }
             else
             {
-                text.text = correctText;
-                while (text.text == correctText)
+                do
                 {
-                    text.text = "";
-                    randomNums[0] = Rnd.Range(0, 6) * 10;
-                    while(takenPunctuations1.Contains(randomNums[0]))
-                    {
-                        randomNums[0] = Rnd.Range(0, 6) * 10;
-                    }
-                    takenPunctuations1.Add(randomNums[0]);
+                    punctuationText[i].text = "";
+                    randomNums[0] = Rnd.Range(0, 6);
                     randomNums[1] = Rnd.Range(0, 10);
-                    while (takenPunctuations2.Contains(randomNums[1]))
-                    {
-                        randomNums[1] = Rnd.Range(0, 10);
-                    }
-                    takenPunctuations2.Add(randomNums[1]);
-                    for (int j = 0; j < 3; j++)
-                    {
-                        if (punctuationList[randomNums[0] + randomNums[1]][j] == 'Q')
-                        {
-                            text.text = text.text + '"';
-                        }
-                        else
-                        {
-                            text.text = text.text + punctuationList[randomNums[0] + randomNums[1]][j];
-                        }
-                    }
-                }
+                    punctuationText[i].text = punctuationList[randomNums[0], randomNums[1]];
+                } while (takenPunctuations.Contains(punctuationText[i].text));
+                takenPunctuations.Add(punctuationText[i].text);
             }
         }
     }
 
     void coloredPiano()
     {
-        if (!moduleDown)
-        {
-            moduleDown = true;
-            pianoGameObject.transform.localPosition = new Vector3(pianoGameObject.transform.localPosition.x, pianoGameObject.transform.localPosition.y - 100f, pianoGameObject.transform.localPosition.z);
-        }
+        pianoGameObject.SetActive(true);
         pianoMaterialNums.Clear();
+        pianoChosenMats.Clear();
         pianoCorrectButton = Rnd.Range(0, 6);
         for (int i = 0; i < 6; i++)
         {
             pianoMaterialNums.Add(i);
-            pianoChosenMats[i] = 6;
         }
-        DebugMsg("The correct key to press is Key " + pianoKeyNames[pianoCorrectButton]);
-        for(int i = 0; i < 6; i++)
+        for (int j = 0; j < 6; j++)
         {
-            if(i == pianoCorrectButton)
+            if (pianoKeyColorPositions[j, memoryBankColumn] == pianoCorrectButton)
             {
-                for(int j = 0; j < 6; j++)
-                {
-                    if(pianoKeyColorPositions[(j * 10) + memoryBankColumn] == i)
-                    {
-                        pianoChosenMats[i] = j;
-                    }
-                }
+                pianoCorrectMaterialNum = j;
+                break;
+            }
+        }
+        for (int i = 0; i < 6; i++)
+        {
+            if (i == pianoCorrectMaterialNum)
+            {
+                pianoKeyNums[pianoCorrectButton] = i;
             }
             else
             {
-                for (int j = 0; j < 6; j++)
+                do
                 {
-                    if (pianoKeyColorPositions[(j * 10) + memoryBankColumn] == i)
+                    pianoPlaceholders[0] = Rnd.Range(0, 6);
+                } while (pianoKeyNums[pianoPlaceholders[0]] != 6 || pianoPlaceholders[0] == pianoCorrectButton);
+                pianoKeyNums[pianoPlaceholders[0]] = i;
+            }
+        }
+        DebugMsg("The correct key to press is Key " + pianoKeyNames[pianoCorrectButton]);
+        checkforcorrects:
+        for(int i = 0; i < 6; i++)
+        {
+            if(i != pianoCorrectButton)
+            {
+                if(pianoKeyColorPositions[pianoKeyNums[i], memoryBankColumn] == i)
+                {
+                    do
                     {
-                        pianoIndex = j;
-                        while(pianoIndex == j || pianoChosenMats.Contains(pianoIndex))
-                        { 
-                            pianoIndex = Rnd.Range(0, 6);
-                        }
-                        pianoChosenMats[i] = pianoIndex;
-                    }
+                        pianoPlaceholders[1] = Rnd.Range(0, 6);
+                    } while (pianoPlaceholders[1] == pianoCorrectButton);
+                    pianoPlaceholders[0] = pianoKeyNums[pianoPlaceholders[1]];
+                    pianoKeyNums[pianoPlaceholders[1]] = pianoKeyNums[i];
+                    pianoKeyNums[i] = pianoPlaceholders[0];
+                    i = 6;
+                    goto checkforcorrects;
                 }
             }
-            pianoKeys[i].material = notMemoryBankMats[pianoChosenMats[i]];
+        }
+        for (int i = 0; i < 6; i++)
+        {
+            pianoKeys[i].material = notMemoryBankMats[pianoKeyNums[i]];
         }
     }
 
     void colorfulMessage()
     {
-        if (!moduleDown)
-        {
-            moduleDown = true;
-            messageGameObject.transform.localPosition = new Vector3(pianoGameObject.transform.localPosition.x, pianoGameObject.transform.localPosition.y - 100f, pianoGameObject.transform.localPosition.z);
-        }
+        messageGameObject.SetActive(true);
         messageDisplayButton.SetActive(true);
         messageButtonPresses = 0;
         messageIndex = Rnd.Range(0, 3);
@@ -890,14 +834,13 @@ public class script : MonoBehaviour
             else
             {
                 yield return null;
-                yield return new KMSelectable[] { buttons[0] };
+                yield return new KMSelectable[] { moduleButton };
             }
         }
         else if(parts.Count() == 1 && parts[0] == "message" && whichModule == 4 && !messageDisplayButtonPressed)
         {
             yield return null;
-            DebugMsg("M");
-            yield return new KMSelectable[] { buttons[37] };
+            yield return new KMSelectable[] { messagePlayButton };
         }
         else if (isCommandValid(cmd))
         {
@@ -906,6 +849,11 @@ public class script : MonoBehaviour
                 if(parts.Count() > 2)
                 {
                     yield return "sendtochat Logic Dive cannot press more than 1 button.";
+                    yield break;
+                }
+                else if (parts.Count() < 2)
+                {
+                    yield return "sendtochat You didn't include a button to press!";
                     yield break;
                 }
                 else if(moduleDetermined || !logicDiveActive)
@@ -920,7 +868,7 @@ public class script : MonoBehaviour
                         if((i + 1).ToString() == parts[1])
                         {
                             yield return null;
-                            yield return new KMSelectable[] { buttons[i + 1] };
+                            yield return new KMSelectable[] { logicButtons[i] };
                         }
                     }
                 }
@@ -948,7 +896,7 @@ public class script : MonoBehaviour
                                 if ((j + 1).ToString() == parts[i + 1])
                                 {
                                     yield return null;
-                                    yield return new KMSelectable[] { buttons[j + 10] };
+                                    yield return new KMSelectable[] { wireSelectables[j] };
                                 }
                             }
                         }
@@ -983,7 +931,7 @@ public class script : MonoBehaviour
                                 if ((j + 1).ToString() == parts[i + 1])
                                 {
                                     yield return null;
-                                    yield return new KMSelectable[] { buttons[j + 13] };
+                                    yield return new KMSelectable[] { colorButtons[j] };
                                 }
                             }
                         }
@@ -1008,7 +956,7 @@ public class script : MonoBehaviour
                             if ((j + 1).ToString() == parts[1])
                             {
                                 yield return null;
-                                yield return new KMSelectable[] { buttons[j + 19] };
+                                yield return new KMSelectable[] { punctuationButtons[j] };
                             }
                         }
                     }
@@ -1032,7 +980,7 @@ public class script : MonoBehaviour
                             if ((j + 1).ToString() == parts[1])
                             {
                                 yield return null;
-                                yield return new KMSelectable[] { buttons[j + 25] };
+                                yield return new KMSelectable[] { pianoButtons[j] };
                             }
                         }
                     }
@@ -1058,7 +1006,7 @@ public class script : MonoBehaviour
                                 if ((j + 1).ToString() == parts[i + 1])
                                 {
                                     yield return null;
-                                    yield return new KMSelectable[] { buttons[j + 31] };
+                                    yield return new KMSelectable[] { messageButtons[j] };
                                 }
                             }
                         }
@@ -1074,6 +1022,30 @@ public class script : MonoBehaviour
         else
         {
             yield break;
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        if (startingSoundEnabled)
+        {
+            moduleButton.OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+        if (!memoryBankSeen)
+        {
+            moduleButton.OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+        if (!logicDiveActive && !moduleDetermined)
+        {
+            moduleButton.OnInteract();
+            yield return new WaitForSeconds(0.1f);
+        }
+        if (logicDiveActive)
+        {
+            logicButtons[logicDiveCorrectButtonNum].OnInteract();
+            yield return new WaitForSeconds(0.1f);
         }
     }
 
