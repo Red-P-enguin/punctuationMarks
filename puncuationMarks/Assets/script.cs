@@ -77,8 +77,20 @@ public class script : MonoBehaviour
     //colored buttons
     public GameObject coloredButtonsGameObject;
     public Renderer[] coloredButtonss;
-    private int[,] firstButtonPresses = { { 4, 5, 3, 6, 1, 2, 5, 6, 3, 4 }, { 4, 1, 6, 2, 2, 1, 5, 2, 6, 6 }, { 4, 5, 5, 4, 3, 3, 5, 3, 6, 1 }, { 5, 5, 2, 6, 5, 2, 5, 4, 4, 4 }, { 2, 6, 2, 3, 1, 4, 1, 1, 6, 6 }, { 1, 3, 3, 1, 2, 4, 6, 2, 3, 3 } };
-    private int[,] secondButtonPresses = { { 3, 4, 3, 1, 1, 1, 1, 1, 4, 3 }, { 5, 5, 4, 1, 6, 5, 6, 6, 2, 4 }, { 5, 2, 1, 2, 1, 2, 3, 4, 2, 4 }, { 5, 3, 5, 6, 6, 3, 2, 4, 2, 6 }, { 3, 5, 4, 5, 4, 6, 2, 6, 5, 3 }, { 3, 1, 6, 6, 2, 1, 3, 4, 2, 6 } };
+    private int[,] firstButtonPresses = { 
+        { 4, 5, 3, 6, 1, 2, 5, 6, 3, 4 }, 
+        { 4, 1, 6, 2, 2, 1, 5, 2, 6, 6 }, 
+        { 4, 5, 5, 4, 3, 3, 5, 3, 6, 1 }, 
+        { 5, 5, 2, 6, 5, 2, 5, 4, 4, 4 }, 
+        { 2, 6, 2, 3, 1, 4, 1, 1, 6, 6 }, 
+        { 1, 3, 3, 1, 2, 4, 6, 2, 3, 3 } };
+    private int[,] secondButtonPresses = { 
+        { 3, 4, 3, 1, 1, 1, 1, 1, 4, 3 }, 
+        { 5, 5, 4, 1, 6, 5, 6, 6, 2, 4 }, 
+        { 5, 2, 1, 2, 1, 2, 3, 4, 2, 4 }, 
+        { 5, 3, 5, 6, 6, 3, 2, 4, 2, 6 },
+        { 3, 5, 4, 5, 4, 6, 2, 6, 5, 3 },
+        { 3, 1, 6, 6, 2, 1, 3, 4, 2, 6 } };
     private int buttonIndex = 0;
     private int buttonWhichButton = 0;
     private int buttonColor = 0;
@@ -90,7 +102,8 @@ public class script : MonoBehaviour
     public GameObject punctuationGameObject;
     public TextMesh[] punctuationText;
     public Renderer punctuationDisplay;
-    private string[,] punctuationList = new string[6, 10] { { "!,.", "\".?", "\"!?", ".!,", ",\".", ".!\"", ",.?", ",.\"", ",?.", "!?.", },
+    private string[,] punctuationList = new string[6, 10] { 
+                                         { "!,.", "\".?", "\"!?", ".!,", ",\".", ".!\"", ",.?", ",.\"", ",?.", "!?.", },
                                          { "\",!", ".?,", "!,\"", ".,\"", "?,.", "\"?!", "?.\"", "?\".", "?!.", "!?\"", },
                                          { ",.\"", "?.,", ".!,", "!,\"", "\",!", "!?,", "!?.", "\"!.", "!,\"", "\"!?", },
                                          { "!?.", "!.?", ".\",", ",!\"", "\".,", "\".,", "?\",", "!?,", "\"?!", "?!.", },
@@ -343,9 +356,9 @@ public class script : MonoBehaviour
         {
             cutWires[index] = true;
             wires[index].GetComponent<MeshFilter>().mesh = wireCondition[1];
-            if (wireCombinations[memoryBankColumn + wireIndex,nextWire] != (index + "1"))
+            if (wireCombinations[wireIndex, memoryBankColumn][nextWire] != (index + '1'))
             {
-                DebugMsg("Strike! Pressed wire " + (index + 1) + ", while the correct wire was wire " + wireCombinations[memoryBankColumn + wireIndex,nextWire] + ".");
+                DebugMsg("Strike! Pressed wire " + (index + 1) + ", while the correct wire was wire " + wireCombinations[wireIndex, memoryBankColumn][nextWire] + ".");
                 incorrect = true;
             }
             else
@@ -373,9 +386,9 @@ public class script : MonoBehaviour
         if (buttonsSecondStage)
         {
             StopAllCoroutines();
-            if (index != secondButtonPresses[buttonColor, memoryBankColumn])
+            if ((index + 1) != secondButtonPresses[buttonColor, memoryBankColumn])
             {
-                DebugMsg("Strike! Pressed button " + colorButtons[index].name + ", while the correct button for that stage was " + colorButtons[firstButtonPresses[buttonColor, memoryBankColumn]].name + ".");
+                DebugMsg("Strike! Pressed button " + colorButtons[index].name + ", while the correct button for that stage was " + colorButtons[secondButtonPresses[buttonColor, memoryBankColumn]].name + ".");
                 GetComponent<KMBombModule>().HandleStrike();
                 buttonsSecondStage = false;
                 coloredButtons();
@@ -389,10 +402,9 @@ public class script : MonoBehaviour
         }
         else
         {
-            if (index != firstButtonPresses[buttonColor, memoryBankColumn])
+            if ((index + 1) != firstButtonPresses[buttonColor, memoryBankColumn])
             {
-                StopAllCoroutines();
-                DebugMsg("Strike! Pressed button " + colorButtons[index].name + ", while the correct button for that stage was " + colorButtons[secondButtonPresses[buttonColor, memoryBankColumn]].name + ".");
+                DebugMsg("Strike! Pressed button " + colorButtons[index].name + ", while the correct button for that stage was " + colorButtons[firstButtonPresses[buttonColor, memoryBankColumn]].name + ".");
                 GetComponent<KMBombModule>().HandleStrike();
                 buttonsSecondStage = false;
                 coloredButtons();
@@ -652,8 +664,8 @@ public class script : MonoBehaviour
         punctuationGameObject.SetActive(true);
         takenPunctuations.Clear();
         correctTextButton = Rnd.Range(0,6);
-        correctText = punctuationList[Rnd.Range(0, 6) , memoryBankColumn];
-        displayMat = Rnd.Range(0,6);
+        displayMat = Rnd.Range(0, 6);
+        correctText = punctuationList[displayMat, memoryBankColumn];
         punctuationDisplay.material = notMemoryBankMats[displayMat];
         DebugMsg("The display's color is " + wirescolors[displayMat] + ".");
         DebugMsg("The correct punctuation marks are " + correctText);
