@@ -696,6 +696,7 @@ public class script : MonoBehaviour
         pianoMaterialNums.Clear();
         pianoChosenMats.Clear();
         pianoCorrectButton = Rnd.Range(0, 6);
+        pianoKeyNums = Enumerable.Repeat(6, 6).ToArray();
         for (int i = 0; i < 6; i++)
         {
             pianoMaterialNums.Add(i);
