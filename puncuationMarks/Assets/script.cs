@@ -600,7 +600,6 @@ public class script : MonoBehaviour
     {
         moduleDetermined = true;
         whichModule = Rnd.Range(0,5);
-        whichModule = 1;
         Invoke(moduleVoids[whichModule], 0.1f);
     }
 
