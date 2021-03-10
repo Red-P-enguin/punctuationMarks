@@ -94,11 +94,12 @@ public class script : MonoBehaviour
     private int buttonIndex = 0;
     private int buttonWhichButton = 0;
     private int buttonColor = 0;
+    private Coroutine colorFlash;
     private List<Material> buttonNotUsedMats = new List<Material>();
     private Material buttonMat;
     public Material buttonFlashingMat;
     private bool buttonsSecondStage = false;
-    //puncuation
+    //punctuation
     public GameObject punctuationGameObject;
     public TextMesh[] punctuationText;
     public Renderer punctuationDisplay;
@@ -134,7 +135,7 @@ public class script : MonoBehaviour
     //colorful message
     public GameObject messageGameObject;
     public GameObject messageDisplayButton;
-    public Renderer messageDispaly;
+    public Renderer messageDisplay;
     public TextMesh[] messageLetters;
     public Material messageBlackMat;
     private int[,] messageWords1 =
@@ -186,6 +187,8 @@ public class script : MonoBehaviour
     private string[] messageColumnLetters = { "ATMSRE", "LOEDOP", "ECLARL", "TDSEAE", "CRUESE", "EARSHS", "REYALB", "USERTD", "TSLBAE", "SEIALD" };
     private string messageSelectedString;
     private bool messageDisplayButtonPressed = false;
+    private bool messageDisplayFinished = false;
+    private Coroutine messageFlash;
 
     bool TwitchPlaysActive;
     private bool TPActive = false;
@@ -352,13 +355,14 @@ public class script : MonoBehaviour
 
     void wireCut(int index)
     {
+        if (moduleSolved) return;
         if (!cutWires[index])
         {
             cutWires[index] = true;
             wires[index].GetComponent<MeshFilter>().mesh = wireCondition[1];
             if (wireCombinations[wireIndex, memoryBankColumn][nextWire] != (index + '1'))
             {
-                DebugMsg("Strike! Pressed wire " + (index + 1) + ", while the correct wire was wire " + wireCombinations[wireIndex, memoryBankColumn][nextWire] + ".");
+                DebugMsg("Strike! Cut wire " + (index + 1) + ", while the correct wire was wire " + wireCombinations[wireIndex, memoryBankColumn][nextWire] + ".");
                 incorrect = true;
             }
             else
@@ -370,6 +374,7 @@ public class script : MonoBehaviour
         {
             DebugMsg("Module solved!");
             moduleSolved = true;
+            audio.PlaySoundAtTransform("solve", transform);
             GetComponent<KMBombModule>().HandlePass();
         }
         else if (incorrect)
@@ -383,12 +388,13 @@ public class script : MonoBehaviour
 
     void coloredButtonPressed(int index)
     {
+        if (moduleSolved) return;
         if (buttonsSecondStage)
         {
-            StopAllCoroutines();
+            StopCoroutine(colorFlash);
             if ((index + 1) != secondButtonPresses[buttonColor, memoryBankColumn])
             {
-                DebugMsg("Strike! Pressed button " + colorButtons[index].name + ", while the correct button for that stage was " + colorButtons[secondButtonPresses[buttonColor, memoryBankColumn]].name + ".");
+                DebugMsg("Strike! Pressed button " + colorButtons[index].name + ", while the correct button for that stage was " + colorButtons[secondButtonPresses[buttonColor, memoryBankColumn] - 1].name + ".");
                 GetComponent<KMBombModule>().HandleStrike();
                 buttonsSecondStage = false;
                 coloredButtons();
@@ -397,6 +403,7 @@ public class script : MonoBehaviour
             {
                 DebugMsg("Module solved!");
                 moduleSolved = true;
+                audio.PlaySoundAtTransform("solve", transform);
                 GetComponent<KMBombModule>().HandlePass();
             }
         }
@@ -404,7 +411,8 @@ public class script : MonoBehaviour
         {
             if ((index + 1) != firstButtonPresses[buttonColor, memoryBankColumn])
             {
-                DebugMsg("Strike! Pressed button " + colorButtons[index].name + ", while the correct button for that stage was " + colorButtons[firstButtonPresses[buttonColor, memoryBankColumn]].name + ".");
+                StopCoroutine(colorFlash);
+                DebugMsg("Strike! Pressed button " + colorButtons[index].name + ", while the correct button for that stage was " + colorButtons[firstButtonPresses[buttonColor, memoryBankColumn] - 1].name + ".");
                 GetComponent<KMBombModule>().HandleStrike();
                 buttonsSecondStage = false;
                 coloredButtons();
@@ -419,6 +427,7 @@ public class script : MonoBehaviour
 
     void punctuationPressed(int index)
     {
+        if (moduleSolved) return;
         if (index != correctTextButton)
         {
             DebugMsg("Strike! Pressed button " + (index + 1) + ", while the correct button was " + (correctTextButton + 1) + ".");
@@ -429,29 +438,33 @@ public class script : MonoBehaviour
         {
             DebugMsg("Module solved!");
             moduleSolved = true;
+            audio.PlaySoundAtTransform("solve", transform);
             GetComponent<KMBombModule>().HandlePass();
         }
     }
 
     void pianoPressed(int index)
     {
+        if (moduleSolved) return;
         if (index == pianoCorrectButton)
         {
             DebugMsg("Module solved!");
             moduleSolved = true;
+            audio.PlaySoundAtTransform("solve", transform);
             GetComponent<KMBombModule>().HandlePass();
         }
         else
         {
             DebugMsg("Strike! Pressed key " + pianoKeyNames[index] + ".");
             GetComponent<KMBombModule>().HandleStrike();
+            pianoKeyNums = new int[6] { 6, 6, 6, 6, 6, 6 };
             coloredPiano();
         }
     }
 
     void messagePressed(int index)
     {
-        if(!messageDisplayButtonPressed)
+        if(!messageDisplayButtonPressed || moduleSolved)
         {
             return;
         }
@@ -463,6 +476,7 @@ public class script : MonoBehaviour
             {
                 DebugMsg("Module solved!");
                 moduleSolved = true;
+                audio.PlaySoundAtTransform("solve", transform);
                 GetComponent<KMBombModule>().HandlePass();
             }
         }
@@ -470,16 +484,18 @@ public class script : MonoBehaviour
         {
             DebugMsg("Strike! Pressed letter " + messageLetters[index].text + ", while the correct letter was " + messageSelectedString[messageSelectedWordsChart[memoryBankColumn, messageButtonPresses]]);
             GetComponent<KMBombModule>().HandleStrike();
+            StopCoroutine(messageFlash);
             messageDisplayButton.SetActive(true);
+            messageDisplayFinished = false;
             messageDisplayButtonPressed = false;
+            messageDisplay.material = messageBlackMat;
             colorfulMessage();
         }
     }
 
     void playMessage()
     {
-        StopAllCoroutines();
-        StartCoroutine(DisplayUpdater());
+        messageFlash = StartCoroutine(DisplayUpdater());
         messageDisplayButtonPressed = true;
         messageDisplayButton.SetActive(false);
     }
@@ -637,7 +653,7 @@ public class script : MonoBehaviour
                     }
                 }
                 buttonNotUsedMats.RemoveAt(buttonIndex);
-                StartCoroutine(Flashy(button));
+                colorFlash = StartCoroutine(Flashy(button));
             }
             else
             {
@@ -783,24 +799,24 @@ public class script : MonoBehaviour
 
     private IEnumerator DisplayUpdater()
     {
-        messageDispaly.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 0]];
+        messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 0]];
         yield return new WaitForSeconds(1f);
-        messageDispaly.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 1]];
+        messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 1]];
         yield return new WaitForSeconds(1f);
-        messageDispaly.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 2]];
+        messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 2]];
         yield return new WaitForSeconds(1f);
-        messageDispaly.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 3]];
+        messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 3]];
         yield return new WaitForSeconds(1f);
-        messageDispaly.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 4]];
+        messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 4]];
         yield return new WaitForSeconds(1f);
-        messageDispaly.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 5]];
+        messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 5]];
         yield return new WaitForSeconds(1f);
-        messageDispaly.material = messageBlackMat;
+        messageDisplay.material = messageBlackMat;
         for (int i = 0; i < 6; i++)
         {
             messageLetters[i].text = "" + messageSelectedString[i];
         }
-        
+        messageDisplayFinished = true;
     }
 
     private bool isCommandValid(string cmd)
@@ -1059,6 +1075,46 @@ public class script : MonoBehaviour
             logicButtons[logicDiveCorrectButtonNum].OnInteract();
             yield return new WaitForSeconds(0.1f);
         }
+        switch (whichModule)
+        {
+            case 0:
+                int start = nextWire;
+                for (int i = start; i < 3; i++)
+                {
+                    wireSelectables[int.Parse(wireCombinations[wireIndex, memoryBankColumn][nextWire].ToString()) - 1].OnInteract();
+                    yield return new WaitForSeconds(0.1f);
+                }
+                break;
+            case 1:
+                colorButtons[firstButtonPresses[buttonColor, memoryBankColumn] - 1].OnInteract();
+                yield return new WaitForSeconds(0.1f);
+                colorButtons[secondButtonPresses[buttonColor, memoryBankColumn] - 1].OnInteract();
+                break;
+            case 2:
+                punctuationButtons[correctTextButton].OnInteract();
+                break;
+            case 3:
+                pianoButtons[pianoCorrectButton].OnInteract();
+                break;
+            case 4:
+                if (!messageDisplayButtonPressed)
+                    messagePlayButton.OnInteract();
+                while (!messageDisplayFinished) { yield return true; }
+                start = messageButtonPresses;
+                for (int i = start; i < 6; i++)
+                {
+                    for (int j = 0; j < 6; j++)
+                    {
+                        if (messageSelectedString[messageSelectedWordsChart[memoryBankColumn, messageButtonPresses]].ToString() == messageLetters[j].text)
+                        {
+                            messageButtons[j].OnInteract();
+                            yield return new WaitForSeconds(0.1f);
+                            break;
+                        }
+                    }
+                }
+                break;
+        }
     }
 
     void DebugMsg(string msg)
@@ -1066,4 +1122,3 @@ public class script : MonoBehaviour
         Debug.LogFormat("[...? #{0}] {1}", ModuleId, msg);
     }
 }
- 
