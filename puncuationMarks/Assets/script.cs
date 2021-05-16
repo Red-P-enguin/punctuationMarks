@@ -31,16 +31,16 @@ public class script : MonoBehaviour
     private int memoryBankNumber = 0;
     public TextMesh memoryBankText;
     private string memoryBanks =
-        "rioygcbpmw" +
-        "imwcrypgob" +
-        "wbymogirpc" +
-        "orbpiwcmgy" +
-        "pcibmroywg" +
-        "gymowbricp" +
-        "cgrwpmyobi" +
-        "mopgciwbyr" +
-        "ywgrbpmcio" +
-        "bpciyogwrm"; //(r)ed p(i)nk (o)range (y)ellow (g)reen (c)yan (b)lue (p)urple (m)agenta (w)hite
+        "rioygcbpkw" +
+        "ikwcrypgob" +
+        "wbykogirpc" +
+        "orbpiwckgy" +
+        "pcibkroywg" +
+        "gykowbricp" +
+        "cgrwpkyobi" +
+        "kopgciwbyr" +
+        "ywgrbpkcio" +
+        "bpciyogwrk"; //(r)ed p(i)nk (o)range (y)ellow (g)reen (c)yan (b)lue (p)urple blac(k) (w)hite
     //starting stuff
     private bool startingSoundEnabled = true;
     private bool moduleDetermined = false;
@@ -56,6 +56,7 @@ public class script : MonoBehaviour
     private int logicDiveCorrectButtonNum = 0;
     private int logicDiveIndex = 0;
     public Renderer[] logicDiveButtons;
+    public TextMesh[] logicColorblindText;
     //general second-half module stuff
     private int whichModule = 0;
     public Material[] notMemoryBankMats;
@@ -64,7 +65,7 @@ public class script : MonoBehaviour
     public Renderer[] wires;
     public GameObject threeWiresGameObject;
     public Mesh[] wireCondition;
-    private string[] wirescolors = { "Crimson", "Brown", "Dark Yellow", "Green", "Blue", "Magenta" };
+    private string[] wirescolors = { "Red", "Orange", "Yellow", "Green", "Blue", "Purple" };
     private string[,] wireCombinations = new string[6, 10] { { "123", "132", "213", "231", "312", "213", "123", "312", "132", "321" },
                                           { "132", "321", "123", "312", "213", "231", "321", "132", "123", "231" },
                                           { "213", "123", "312", "321", "231", "132", "312", "231", "213", "123" },
@@ -74,6 +75,7 @@ public class script : MonoBehaviour
     private int wireIndex = 0;
     private int nextWire = 0;
     private bool[] cutWires = { false, false, false };
+    public TextMesh wireColorblindText;
     //colored buttons
     public GameObject coloredButtonsGameObject;
     public Renderer[] coloredButtonss;
@@ -99,6 +101,10 @@ public class script : MonoBehaviour
     private Material buttonMat;
     public Material buttonFlashingMat;
     private bool buttonsSecondStage = false;
+<<<<<<< Updated upstream
+=======
+    public TextMesh[] buttonsColorblindText;
+>>>>>>> Stashed changes
     //punctuation
     public GameObject punctuationGameObject;
     public TextMesh[] punctuationText;
@@ -115,6 +121,7 @@ public class script : MonoBehaviour
     private int displayMat = 0;
     private int[] randomNums = new int[2];
     private List<string> takenPunctuations = new List<string>();
+    public TextMesh punctuationColorblindText;
     //colored piano
     public GameObject pianoGameObject;
     public Renderer[] pianoKeys;
@@ -132,6 +139,7 @@ public class script : MonoBehaviour
 
     private int[] pianoKeyNums = new int[6] { 6,6,6,6,6,6 };
     private int[] pianoPlaceholders = new int[2];
+    public TextMesh[] pianoColorblindText;
     //colorful message
     public GameObject messageGameObject;
     public GameObject messageDisplayButton;
@@ -189,23 +197,24 @@ public class script : MonoBehaviour
     private bool messageDisplayButtonPressed = false;
     private bool messageDisplayFinished = false;
     private Coroutine messageFlash;
+<<<<<<< Updated upstream
+=======
+    public TextMesh messageColorblindText;
+>>>>>>> Stashed changes
 
     bool TwitchPlaysActive;
     private bool TPActive = false;
     private bool tpNumHigherThanThree;
     private bool tpNumHigherThanSix;
 
+    public KMColorblindMode colorblindActive;
+    private bool colorblindEnabled;
+    public GameObject[] allColorblindText;
+
     void OnActivate()
     {
-        if (TwitchPlaysActive == true)
-        {
-            TPActive = true;
-            DebugMsg("Twitch Plays mode active.");
-        }
-        else
-        {
-            TPActive = false;
-        }
+        TPActive = TwitchPlaysActive;
+        colorblindEnabled = colorblindActive.ColorblindModeActive;
     }
 
     void Start()
@@ -288,6 +297,7 @@ public class script : MonoBehaviour
 
     void modulePressed()
     {
+        moduleButton.AddInteractionPunch();
         if (startingSoundEnabled && !moduleDetermined)
         {
             startingSoundEnabled = false;
@@ -333,6 +343,7 @@ public class script : MonoBehaviour
 
     void logicPressed(int index)
     {
+        logicButtons[index].AddInteractionPunch();
         logicDiveActive = false;
         logicDiveGameObject.SetActive(false);
         if (index != logicDiveCorrectButtonNum)
@@ -355,6 +366,10 @@ public class script : MonoBehaviour
 
     void wireCut(int index)
     {
+<<<<<<< Updated upstream
+=======
+        wireSelectables[index].AddInteractionPunch();
+>>>>>>> Stashed changes
         if (moduleSolved) return;
         if (!cutWires[index])
         {
@@ -388,6 +403,10 @@ public class script : MonoBehaviour
 
     void coloredButtonPressed(int index)
     {
+<<<<<<< Updated upstream
+=======
+        colorButtons[index].AddInteractionPunch();
+>>>>>>> Stashed changes
         if (moduleSolved) return;
         if (buttonsSecondStage)
         {
@@ -427,6 +446,10 @@ public class script : MonoBehaviour
 
     void punctuationPressed(int index)
     {
+<<<<<<< Updated upstream
+=======
+        punctuationButtons[index].AddInteractionPunch();
+>>>>>>> Stashed changes
         if (moduleSolved) return;
         if (index != correctTextButton)
         {
@@ -445,6 +468,10 @@ public class script : MonoBehaviour
 
     void pianoPressed(int index)
     {
+<<<<<<< Updated upstream
+=======
+        pianoButtons[index].AddInteractionPunch();
+>>>>>>> Stashed changes
         if (moduleSolved) return;
         if (index == pianoCorrectButton)
         {
@@ -464,7 +491,12 @@ public class script : MonoBehaviour
 
     void messagePressed(int index)
     {
+<<<<<<< Updated upstream
         if(!messageDisplayButtonPressed || moduleSolved)
+=======
+        messageButtons[index].AddInteractionPunch();
+        if (!messageDisplayButtonPressed || moduleSolved)
+>>>>>>> Stashed changes
         {
             return;
         }
@@ -495,6 +527,10 @@ public class script : MonoBehaviour
 
     void playMessage()
     {
+<<<<<<< Updated upstream
+=======
+        messagePlayButton.AddInteractionPunch();
+>>>>>>> Stashed changes
         messageFlash = StartCoroutine(DisplayUpdater());
         messageDisplayButtonPressed = true;
         messageDisplayButton.SetActive(false);
@@ -513,6 +549,10 @@ public class script : MonoBehaviour
                     if (logicDiveMats[i].name.Equals(memoryBanks[memoryBankNumber].ToString()))
                     {
                         logicDiveButtons[logicDiveCorrectButtonNum].material = logicDiveMats[i];
+                        if(colorblindEnabled)
+                        {
+                            logicColorblindText[logicDiveCorrectButtonNum].text = logicDiveMats[i].name.ToUpper();
+                        }
                         for (int j = 0; j < 10; j++)
                         {
                             if (i != j)
@@ -529,6 +569,10 @@ public class script : MonoBehaviour
                     {
                         logicDiveIndex = Rnd.Range(0, logicDiveNotCorrectMats.Count);
                         logicDiveButtons[i].material = logicDiveNotCorrectMats[logicDiveIndex];
+                        if (colorblindEnabled)
+                        {
+                            logicColorblindText[i].text = logicDiveNotCorrectMats[logicDiveIndex].name.ToUpper();
+                        }
                         logicDiveNotCorrectMats.RemoveAt(logicDiveIndex);
                     }
                 }
@@ -562,6 +606,10 @@ public class script : MonoBehaviour
                 if (logicDiveMats[i].name.Equals(memoryBanks[memoryBankNumber].ToString()))
                 {
                     logicDiveButtons[logicDiveCorrectButtonNum].material = logicDiveMats[i];
+                    if (colorblindEnabled)
+                    {
+                        logicColorblindText[logicDiveCorrectButtonNum].text = logicDiveMats[i].name.ToUpper();
+                    }
                     for (int j = 0; j < 10; j++)
                     {
                         if (logicDiveMats[j] != logicDiveMats[i])
@@ -578,6 +626,10 @@ public class script : MonoBehaviour
                 {
                     logicDiveIndex = Rnd.Range(0, logicDiveNotCorrectMats.Count);
                     logicDiveButtons[i].material = logicDiveNotCorrectMats[logicDiveIndex];
+                    if(colorblindEnabled)
+                    {
+                        logicColorblindText[i].text = logicDiveNotCorrectMats[logicDiveIndex].name.ToUpper();
+                    }
                     logicDiveNotCorrectMats.RemoveAt(logicDiveIndex);
                 }
             }
@@ -605,6 +657,8 @@ public class script : MonoBehaviour
 
     void threeWires()
     {
+        string colorblindText = "";
+
         threeWiresGameObject.SetActive(true);
         for(int i = 0; i < 3; i++)
         {
@@ -621,8 +675,14 @@ public class script : MonoBehaviour
             }
             else
             {
-                wire.material = notMemoryBankMats[Rnd.Range(0, 6)];
+                wireIndex = Rnd.Range(0, 6);
+                wire.material = notMemoryBankMats[wireIndex];
             }
+            colorblindText += wirescolors[wireIndex][0];
+        }
+        if(colorblindEnabled)
+        {
+            wireColorblindText.text = colorblindText[0] + "\n" + colorblindText[1] + "\n" + colorblindText[2];
         }
     }
 
@@ -662,6 +722,10 @@ public class script : MonoBehaviour
                 buttonNotUsedMats.RemoveAt(buttonIndex);
             }
         }
+        for(int i = 0; i < 6; i++)
+        {
+            buttonsColorblindText[i].text = "" + coloredButtonss[i].material.name[4];
+        }
     }
 
     private IEnumerator Flashy(Renderer button)
@@ -684,6 +748,10 @@ public class script : MonoBehaviour
         correctText = punctuationList[displayMat, memoryBankColumn];
         punctuationDisplay.material = notMemoryBankMats[displayMat];
         DebugMsg("The display's color is " + wirescolors[displayMat] + ".");
+        if(colorblindEnabled)
+        {
+            punctuationColorblindText.text = wirescolors[displayMat].ToUpper();
+        }
         DebugMsg("The correct punctuation marks are " + correctText);
         takenPunctuations.Add(correctText);
         for (int i = 0; i < 6; i++)
@@ -762,6 +830,10 @@ public class script : MonoBehaviour
         for (int i = 0; i < 6; i++)
         {
             pianoKeys[i].material = notMemoryBankMats[pianoKeyNums[i]];
+            if(colorblindEnabled)
+            {
+                pianoColorblindText[i].text = wirescolors[pianoKeyNums[i]].ToUpper();
+            }
         }
     }
 
@@ -800,6 +872,7 @@ public class script : MonoBehaviour
     private IEnumerator DisplayUpdater()
     {
         messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 0]];
+<<<<<<< Updated upstream
         yield return new WaitForSeconds(1f);
         messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 1]];
         yield return new WaitForSeconds(1f);
@@ -812,6 +885,48 @@ public class script : MonoBehaviour
         messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 5]];
         yield return new WaitForSeconds(1f);
         messageDisplay.material = messageBlackMat;
+=======
+        if(colorblindEnabled)
+        {
+            messageColorblindText.text = wirescolors[messageSelectedWordsChart[memoryBankColumn, 0]].ToUpper();
+        }
+        yield return new WaitForSeconds(1f);
+        messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 1]];
+        if (colorblindEnabled)
+        {
+            messageColorblindText.text = wirescolors[messageSelectedWordsChart[memoryBankColumn, 1]].ToUpper();
+        }
+        yield return new WaitForSeconds(1f);
+        messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 2]];
+        if (colorblindEnabled)
+        {
+            messageColorblindText.text = wirescolors[messageSelectedWordsChart[memoryBankColumn, 2]].ToUpper();
+        }
+        yield return new WaitForSeconds(1f);
+        messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 3]];
+        if (colorblindEnabled)
+        {
+            messageColorblindText.text = wirescolors[messageSelectedWordsChart[memoryBankColumn, 3]].ToUpper();
+        }
+        yield return new WaitForSeconds(1f);
+        messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 4]];
+        if (colorblindEnabled)
+        {
+            messageColorblindText.text = wirescolors[messageSelectedWordsChart[memoryBankColumn, 4]].ToUpper();
+        }
+        yield return new WaitForSeconds(1f);
+        messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 5]];
+        if (colorblindEnabled)
+        {
+            messageColorblindText.text = wirescolors[messageSelectedWordsChart[memoryBankColumn, 5]].ToUpper();
+        }
+        yield return new WaitForSeconds(1f);
+        messageDisplay.material = messageBlackMat;
+        if (colorblindEnabled)
+        {
+            messageColorblindText.text = "";
+        }
+>>>>>>> Stashed changes
         for (int i = 0; i < 6; i++)
         {
             messageLetters[i].text = "" + messageSelectedString[i];
@@ -844,13 +959,12 @@ public class script : MonoBehaviour
     }
 
 #pragma warning disable 414
-    public string TwitchHelpMessage = "!{0} tap to tap the module before the logic dive. !{0} logic 1-9 to tap the button in that position in reading order. !{0} cut 1-3 to cut wires (Three Wires). !{0} press/tap 1-6 to press a button (Colored Buttons/Punctuation Buttons/Colored Piano/Colorful Message).  Commands that are related to a selected module after a logic dive can be chained. To press the small button in Colorful Message, do !{0} message.";
+    public string TwitchHelpMessage = "!{0} tap to tap the module before the logic dive. !{0} logic 1-9 to tap the button in that position in reading order. !{0} cut 1-3 to cut wires (Three Wires). !{0} press/tap 1-6 to press a button (Colored Buttons/Punctuation Buttons/Colored Piano/Colorful Message).  Commands that are related to a selected module after a logic dive can be chained. To press the small button in Colorful Message, do !{0} message. !{0} colorblind to toggle colorblind.";
 #pragma warning restore 414
     IEnumerator ProcessTwitchCommand(string cmd)
     {
         tpNumHigherThanThree = false;
         tpNumHigherThanSix = false;
-        TPActive = true;
         var parts = cmd.ToLowerInvariant().Split(new[] { ' ' });
         if(parts.Count() == 1 && parts[0] == "tap")
         {
@@ -869,6 +983,26 @@ public class script : MonoBehaviour
         {
             yield return null;
             yield return new KMSelectable[] { messagePlayButton };
+        }
+        else if (parts.Count() == 1 && parts[0] == "colorblind")
+        {
+            yield return null;
+            if (colorblindEnabled)
+            {
+                colorblindEnabled = false;
+                foreach (GameObject text in allColorblindText)
+                {
+                    text.SetActive(false);
+                }
+            }
+            else
+            {
+                colorblindEnabled = true;
+                foreach (GameObject text in allColorblindText)
+                {
+                    text.SetActive(true);
+                }
+            }
         }
         else if (isCommandValid(cmd))
         {
