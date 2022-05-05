@@ -101,10 +101,7 @@ public class script : MonoBehaviour
     private Material buttonMat;
     public Material buttonFlashingMat;
     private bool buttonsSecondStage = false;
-<<<<<<< Updated upstream
-=======
     public TextMesh[] buttonsColorblindText;
->>>>>>> Stashed changes
     //punctuation
     public GameObject punctuationGameObject;
     public TextMesh[] punctuationText;
@@ -197,10 +194,7 @@ public class script : MonoBehaviour
     private bool messageDisplayButtonPressed = false;
     private bool messageDisplayFinished = false;
     private Coroutine messageFlash;
-<<<<<<< Updated upstream
-=======
     public TextMesh messageColorblindText;
->>>>>>> Stashed changes
 
     bool TwitchPlaysActive;
     private bool TPActive = false;
@@ -366,10 +360,7 @@ public class script : MonoBehaviour
 
     void wireCut(int index)
     {
-<<<<<<< Updated upstream
-=======
         wireSelectables[index].AddInteractionPunch();
->>>>>>> Stashed changes
         if (moduleSolved) return;
         if (!cutWires[index])
         {
@@ -403,10 +394,7 @@ public class script : MonoBehaviour
 
     void coloredButtonPressed(int index)
     {
-<<<<<<< Updated upstream
-=======
         colorButtons[index].AddInteractionPunch();
->>>>>>> Stashed changes
         if (moduleSolved) return;
         if (buttonsSecondStage)
         {
@@ -446,10 +434,7 @@ public class script : MonoBehaviour
 
     void punctuationPressed(int index)
     {
-<<<<<<< Updated upstream
-=======
         punctuationButtons[index].AddInteractionPunch();
->>>>>>> Stashed changes
         if (moduleSolved) return;
         if (index != correctTextButton)
         {
@@ -468,10 +453,7 @@ public class script : MonoBehaviour
 
     void pianoPressed(int index)
     {
-<<<<<<< Updated upstream
-=======
         pianoButtons[index].AddInteractionPunch();
->>>>>>> Stashed changes
         if (moduleSolved) return;
         if (index == pianoCorrectButton)
         {
@@ -491,12 +473,8 @@ public class script : MonoBehaviour
 
     void messagePressed(int index)
     {
-<<<<<<< Updated upstream
-        if(!messageDisplayButtonPressed || moduleSolved)
-=======
         messageButtons[index].AddInteractionPunch();
         if (!messageDisplayButtonPressed || moduleSolved)
->>>>>>> Stashed changes
         {
             return;
         }
@@ -527,10 +505,7 @@ public class script : MonoBehaviour
 
     void playMessage()
     {
-<<<<<<< Updated upstream
-=======
         messagePlayButton.AddInteractionPunch();
->>>>>>> Stashed changes
         messageFlash = StartCoroutine(DisplayUpdater());
         messageDisplayButtonPressed = true;
         messageDisplayButton.SetActive(false);
@@ -658,6 +633,7 @@ public class script : MonoBehaviour
     void threeWires()
     {
         string colorblindText = "";
+        int dummy;
 
         threeWiresGameObject.SetActive(true);
         for(int i = 0; i < 3; i++)
@@ -669,17 +645,19 @@ public class script : MonoBehaviour
             wire.GetComponent<MeshFilter>().mesh = wireCondition[0];
             if (wire == wires[1])
             {
-                wireIndex = Rnd.Range(0, 6);
+                dummy = Rnd.Range(0, 6);
+                wireIndex = dummy;
                 DebugMsg("The middle wire's color is " + wirescolors[wireIndex] + ".");
                 wire.material = notMemoryBankMats[wireIndex];
             }
             else
             {
-                wireIndex = Rnd.Range(0, 6);
-                wire.material = notMemoryBankMats[wireIndex];
+                dummy = Rnd.Range(0, 6);
+                wire.material = notMemoryBankMats[dummy];
             }
-            colorblindText += wirescolors[wireIndex][0];
+            colorblindText += wirescolors[dummy][0];
         }
+        DebugMsg("" + wireCombinations[wireIndex, memoryBankColumn][0] + wireCombinations[wireIndex, memoryBankColumn][1] + wireCombinations[wireIndex, memoryBankColumn][2]);
         if(colorblindEnabled)
         {
             wireColorblindText.text = colorblindText[0] + "\n" + colorblindText[1] + "\n" + colorblindText[2];
@@ -872,20 +850,6 @@ public class script : MonoBehaviour
     private IEnumerator DisplayUpdater()
     {
         messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 0]];
-<<<<<<< Updated upstream
-        yield return new WaitForSeconds(1f);
-        messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 1]];
-        yield return new WaitForSeconds(1f);
-        messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 2]];
-        yield return new WaitForSeconds(1f);
-        messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 3]];
-        yield return new WaitForSeconds(1f);
-        messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 4]];
-        yield return new WaitForSeconds(1f);
-        messageDisplay.material = notMemoryBankMats[messageSelectedWordsChart[memoryBankColumn, 5]];
-        yield return new WaitForSeconds(1f);
-        messageDisplay.material = messageBlackMat;
-=======
         if(colorblindEnabled)
         {
             messageColorblindText.text = wirescolors[messageSelectedWordsChart[memoryBankColumn, 0]].ToUpper();
@@ -926,7 +890,6 @@ public class script : MonoBehaviour
         {
             messageColorblindText.text = "";
         }
->>>>>>> Stashed changes
         for (int i = 0; i < 6; i++)
         {
             messageLetters[i].text = "" + messageSelectedString[i];
